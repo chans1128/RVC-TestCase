@@ -1,5 +1,6 @@
+#include <stdbool.h>
 #ifndef HEADER_H
-# define HEADER_H
+#define HEADER_H
 
 extern bool FrontSensorInput;
 extern bool RightSensorInput;
