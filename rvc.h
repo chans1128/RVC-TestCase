@@ -7,8 +7,8 @@ extern bool RightSensorInput;
 extern bool LeftSensorInput;
 extern bool DustSensorInput;
 
-void CleanerInterface(char CleanerCommand);
-void MotorInterface(char MotorCommand);
+char CleanerInterface(char CleanerCommand);
+char MotorInterface(char MotorCommand);
 
 bool FrontSensorInterface();
 bool RightSensorInterface();
@@ -18,12 +18,10 @@ bool DustSensorInterface();
 bool *DetermineObstacleLocation();
 bool DetermineDustExistence();
 
-void MoveForward(bool Enable);
-void TurnLeft();
-void TurnBack();
-void PowerUp();
-void Cleaner(bool On);
-
-void activateRVC();
+char MoveForward(bool Enable);
+char TurnLeft();
+char TurnBack();
+char PowerUp();
+char Cleaner(bool On);
 
 #endif

@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "rvc.h"
 
 bool FrontSensorInput = false;
@@ -7,51 +8,61 @@ bool RightSensorInput = false;
 bool LeftSensorInput = false;
 bool DustSensorInput = false;
 
-void CleanerInterface(char CleanerCommand);
-void MotorInterface(char MotorCommand);
+char CleanerInterface(char CleanerCommand);
+char MotorInterface(char MotorCommand);
 
+//1
 bool FrontSensorInterface()
 {
 	// 프론트 센서의 값을 읽어 반환합니다.
 	return FrontSensorInput;
 }
+
+//2
 bool RightSensorInterface()
 {
 	// 오른쪽 센서의 값을 읽어 반환합니다.
 	return RightSensorInput;
 }
+
+//3
 bool LeftSensorInterface()
 {
 	// 왼쪽 센서의 값을 읽어 반환합니다.
 	return LeftSensorInput;
 }
+
+//4
 bool DustSensorInterface()
 {
 	// 먼지 센서의 값을 읽어 반환합니다.
 	return DustSensorInput;
 }
 
+//5
 bool *DetermineObstacleLocation()
 {
-	bool ObstacleLocation[3] = {false, false, false};
+	bool ObstacleLocation[3] = {false, false, false}; // 전방, 좌측, 우측
+	
 	if (FrontSensorInterface())
 	{
 		printf("Obstacle Location: Front\n");
 		ObstacleLocation[0] = true;
 	}
-	if (RightSensorInterface())
-	{
-		printf("Obstacle Location: Right\n");
-		ObstacleLocation[1] = true;
-	}
 	if (LeftSensorInterface())
 	{
 		printf("Obstacle Location: Left\n");
+		ObstacleLocation[1] = true;
+	}
+	if (RightSensorInterface())
+	{
+		printf("Obstacle Location: Right\n");
 		ObstacleLocation[2] = true;
 	}
 	return ObstacleLocation;
 }
 
+//6
 bool DetermineDustExistence()
 {
 	if (DustSensorInterface())
@@ -60,132 +71,108 @@ bool DetermineDustExistence()
 	}
 	return false;
 }
-void MoveForward(bool Enable)
+
+//7
+char MoveForward(bool Enable)
 {
 	if(Enable) {
 		("MoveForward : Motor 전달\n");
-		MotorInterface('F');
+		return MotorInterface('F');
 	}else{
-		MotorInterface('S');
+		return MotorInterface('S');
 	}
 }
 
-void TurnLeft()
+//8
+char TurnLeft()
 {
 	printf("Turn Left : Motor 전달\n");
-	MotorInterface('L');
+	return MotorInterface('L');
 }
 
-void TurnRight()
+//9
+char TurnRight()
 {
 	printf("Turn Right : Motor 전달\n");
-	MotorInterface('R');
+	return MotorInterface('R');
 }
 
-void TurnBack()
+//10
+char TurnBack()
 {
 	printf("Turn Back : Motor 전달\n");
-	MotorInterface('B');
+	return MotorInterface('B');
 }
 
-void PowerUp()
+//11
+char PowerUp()
 {
 	printf("Power Up : Cleaner 전달\n");
-	CleanerInterface('U');
+	return CleanerInterface('U');
 }
 
-void Cleaner(bool On)
+//12
+char Cleaner(bool On)
 {
 	if (On)
 	{
-		printf("Turn on : Cleaner 전달r\n");
-		CleanerInterface('O');
+		printf("Turn on : Cleaner 전달\n");
+		return CleanerInterface('O');
 	}
 	else
 	{
 		printf("Turn off : Cleaner 전달\n");
-		CleanerInterface('F');
+		return CleanerInterface('F');
 	}
 }
 
-void CleanerInterface(char CleanerCommand)
+//13
+char CleanerInterface(char CleanerCommand)
 {
 	switch (CleanerCommand)
 	{
 		case 'O' :
 			//Cleaner On 작동
 			printf("On Cleaner\n");
-			break;
+			return CleanerCommand;
 		case 'F' :
 			//Cleaner OFf 작동
 			printf("Off Cleaner\n");
-			break;
+			return CleanerCommand;
 		case 'U' :
 			//Cleaner Power Up 작동
-			printf("Poer Up Cleaner\n");
+			return CleanerCommand;
+		default:
+			return 'E';
 	}
 }
 
-void MotorInterface(char MotorCommand)
+//14
+char MotorInterface(char MotorCommand)
 {
 	switch (MotorCommand)
 	{
 		case 'F':
 			//모터 '앞으로 전진' 작동
 			printf("Move Forward\n");
-			break;
+			return MotorCommand;
 		case 'L':
 			//Tick*5동안 왼쪽으로 회전 작동
 			printf("Turn Left\n");
-			break;
+			return MotorCommand;
 		case 'R':
 			//Tick*5동안 오른쪽으로 회전 작동
 			printf("Turn Right\n");
-			break;
+			return MotorCommand;
 		case 'B':
 			//Tick*10동안 왼쪽으로 회전 작동해서 180도 돌기
 			printf("Turn Back\n");
-			break;
+			return MotorCommand;
 		case 'S' :
 			//Motor 중지
 			printf("Motor Disable\n");
-			break;
+			return MotorCommand;
+		default:
+			return 'E';
 	}
-}
-
-void activateRVC() {
-
-	while(true){
-		bool * location = DetermineObstacleLocation();
-		bool dustEx = DetermineDustExistence();
-		bool enable = true;
-		bool disable = false;
-
-		if (location[0] && !location[1]){ //Turn Left 상태 변화
-			MoveForward(disable);
-			Cleaner(disable);
-			TurnLeft();
-			MoveForward(enable);
-			Cleaner(enable);
-		} else if(location[0] && location[1] && !location[2]){
-			MoveForward(disable);
-			Cleaner(disable);
-			TurnRight();
-			MoveForward(enable);
-			Cleaner(enable);
-		} else if(location[0] && location[1] && location[2]){
-			MoveForward(disable);
-			Cleaner(disable);
-			TurnBack();
-			MoveForward(enable);
-			Cleaner(enable);
-		}
-
-		if(dustEx) {
-			PowerUp();
-		}else {
-			Cleaner(enable);
-		}
-	}
-
 }
